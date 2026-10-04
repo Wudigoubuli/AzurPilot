@@ -74,6 +74,16 @@ _ZONE_PINNED_SIMILARITY_THRESHOLDS = {
     (3840, 2160): 0.65,
 }
 _ZONE_PINNED_SIMILARITY_DEFAULT = 0.75
+# _ZONE_PINNED_SIMILARITY_DEFAULT is calibrated for native 720p. Every other resolution
+# is captured at its own size and downscaled back to 720p (see TEMPLATE_MATCH_NON_NATIVE_720P),
+# which blurs the pinned-zone label and lowers its match score, so a non-native resolution
+# missing from the table above must not fall back to the native-calibrated 0.75. When it does,
+# the pinned state is never detected, globe_focus_to() retries until the click guard raises
+# GameTooManyClickError, and the task loop restarts the game forever.
+# Measured 2026-10-04 on 3120x1755 (MuMu 2.4375x, same frame with a pinned 隐秘海域 label):
+# correct type 0.659 (nemu_ipc capture path) / 0.697 (adb), wrong types <= 0.523,
+# and <= 0.582 over 541 native 720p screenshots.
+_ZONE_PINNED_SIMILARITY_NON_NATIVE_DEFAULT = 0.60
 
 
 class OSExploreError(Exception):
